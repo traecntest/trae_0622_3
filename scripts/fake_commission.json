@@ -1,0 +1,405 @@
+{
+  "id": "fake_commission",
+  "name": "刷单返利诈骗",
+  "description": "骗子以兼职刷单为名，承诺小额返利，先让受害人尝到甜头，再诱骗大额投入，最终卷款跑路。",
+  "difficulty": "medium",
+  "estimated_time": 5,
+  "scam_type": "刷单返利",
+  "nodes": [
+    {
+      "id": "start",
+      "speaker": "微信群消息",
+      "text": "【高薪兼职】在家就能做，日赚300-500元！只需手机动动手指，帮商家刷好评赚佣金。想做的回复'1'，拉你进群。",
+      "is_start": true,
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "回复'1'，想了解一下",
+          "next_node": "join_group",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "刷单是违法的，不参与",
+          "next_node": "refuse_legal",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_3",
+          "text": "可疑消息，直接忽略",
+          "next_node": "ignore_msg",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "刷单本身就是违法行为，所有刷单兼职都是诈骗！"
+    },
+    {
+      "id": "join_group",
+      "speaker": "客服小美",
+      "text": "您好！欢迎加入我们的刷单平台。新人首单立返5元，每单佣金5-20元，多劳多得。请问您现在方便操作吗？",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "方便，开始吧",
+          "next_node": "first_task",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "需要我先交钱吗？",
+          "next_node": "ask_fee",
+          "risk_delta": 5,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_3",
+          "text": "算了，我不做了",
+          "next_node": "quit_early",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "正规工作不会在群里招人，更不会许诺轻松高薪。"
+    },
+    {
+      "id": "refuse_legal",
+      "speaker": "系统",
+      "text": "您正确认识到刷单是违法行为，拒绝参与。根据《反不正当竞争法》，刷单炒信属于违法行为，参与刷单可能承担法律责任。",
+      "is_end": true,
+      "node_type": "ending_good",
+      "options": []
+    },
+    {
+      "id": "ignore_msg",
+      "speaker": "系统",
+      "text": "您选择忽略可疑消息。面对陌生群聊中的高薪诱惑，保持警惕是最好的防骗方式。",
+      "is_end": true,
+      "node_type": "ending_good",
+      "options": []
+    },
+    {
+      "id": "first_task",
+      "speaker": "客服小美",
+      "text": "好的！第一单很简单，您只需要拍下面这个商品（不需要真付款，我们会发红包给您），好评后截图给我，立返5元佣金。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "好的，我来操作",
+          "next_node": "first_complete",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "为什么不用真付款？感觉有问题",
+          "next_node": "doubt_fake",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "小额返利是骗子的诱饵，先让你尝到甜头，后面会骗你投入更多。"
+    },
+    {
+      "id": "ask_fee",
+      "speaker": "客服小美",
+      "text": "不需要任何押金会费！完全免费！您只需要按我们的指引下单，我们先打钱给您。您放心，大平台有保障的。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "那我试试",
+          "next_node": "first_task",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "还是算了吧",
+          "next_node": "quit_early",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "骗子常说'免费''无门槛'来吸引你入局，但后面会找各种理由让你掏钱。"
+    },
+    {
+      "id": "quit_early",
+      "speaker": "系统",
+      "text": "您在陷入之前及时退出了。虽然有过好奇，但您最终选择了谨慎。记住：天上不会掉馅饼，轻松高薪的背后往往是陷阱。",
+      "is_end": true,
+      "node_type": "ending_neutral",
+      "options": []
+    },
+    {
+      "id": "first_complete",
+      "speaker": "客服小美",
+      "text": "太棒了！第一单完成得很好！5元佣金已转到您账户。现在是连单任务，三单一起做，佣金更高，一共能赚50元。需要您先垫付本金，完成后本金+佣金一起返还。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "要先垫付？算了，不做了",
+          "next_node": "quit_before_pay",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "垫付多少钱？",
+          "next_node": "ask_amount",
+          "risk_delta": 5,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_3",
+          "text": "好，继续做",
+          "next_node": "ask_amount",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        }
+      ],
+      "risk_tip": "凡是要求先垫付本金的刷单都是诈骗！"
+    },
+    {
+      "id": "doubt_fake",
+      "speaker": "客服小美",
+      "text": "这你就不懂了，我们是正规平台和商家合作，用的是内部优惠券，不用你花钱。您放心，第一单是试单，让您体验一下。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "好吧，我试试",
+          "next_node": "first_complete",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "还是不放心，不做了",
+          "next_node": "quit_early",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "相信自己的直觉，感到不对劲就及时止损。"
+    },
+    {
+      "id": "quit_before_pay",
+      "speaker": "系统",
+      "text": "您在需要垫付资金前及时退出了。虽然小赚了5元，但您守住了底线。记住：骗子前期给小利，就是为了后期骗大钱。",
+      "is_end": true,
+      "node_type": "ending_neutral",
+      "options": []
+    },
+    {
+      "id": "ask_amount",
+      "speaker": "客服小美",
+      "text": "三单的本金分别是100元、200元、300元，三单完成后返还本金600元+佣金80元，一共680元。很划算的！这是最低档的，还有更高档的，赚得更多。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "我做最低档的",
+          "next_node": "pay_first",
+          "risk_delta": 15,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "一单接一单行不？",
+          "next_node": "refuse_combined",
+          "risk_delta": 5,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_3",
+          "text": "钱太多了，我不做了",
+          "next_node": "quit_before_pay",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "'连单任务''系统卡单''资金冻结'都是骗子编造的理由，目的就是让你不断投钱。"
+    },
+    {
+      "id": "refuse_combined",
+      "speaker": "客服小美",
+      "text": "不行哦，这是系统设置的连单任务，必须三单一起完成才能结算。您放心，钱都在平台账户里，很安全的。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "那行吧，我做",
+          "next_node": "pay_first",
+          "risk_delta": 15,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "我不做了，把我之前的5元退给我",
+          "next_node": "demand_refund",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "当骗子开始给你画饼又设置规则时，就是在给你下套。"
+    },
+    {
+      "id": "demand_refund",
+      "speaker": "客服小美",
+      "text": "哎呀，5元您都已经赚了，怎么这么小气呢？再往下做做，赚得更多嘛。真的不考虑了？",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "不做了，再见",
+          "next_node": "quit_before_pay",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "那就...再做几单？",
+          "next_node": "pay_first",
+          "risk_delta": 15,
+          "is_safe_choice": false
+        }
+      ],
+      "risk_tip": "贪小便宜吃大亏，及时止损才是明智之选。"
+    },
+    {
+      "id": "pay_first",
+      "speaker": "客服小美",
+      "text": "好的！请先转账100元到这个账户：622848******1234567，备注您的会员号。转完发截图给我。",
+      "trigger_calm": true,
+      "calm_message": "⚠️ 风险提示！\n\n您即将转账给陌生人！\n\n请冷静思考：\n• 刷单本身就是违法的\n• 先垫付后返还是诈骗常用套路\n• 您认识对方吗？\n• 钱转出去还能要回来吗？\n\n请花10秒钟认真想想！",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "我不转了，这是诈骗",
+          "next_node": "realize_scam",
+          "risk_delta": -10,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "转100块试试吧",
+          "next_node": "after_first_pay",
+          "risk_delta": 15,
+          "is_safe_choice": false
+        }
+      ],
+      "risk_tip": "只要涉及给陌生人转账汇款，就要高度警惕！"
+    },
+    {
+      "id": "realize_scam",
+      "speaker": "系统",
+      "text": "在冷静期内，您及时识破了骗局，没有造成损失。您还拨打110举报了这个诈骗群。好样的！",
+      "is_end": true,
+      "node_type": "ending_good",
+      "options": []
+    },
+    {
+      "id": "after_first_pay",
+      "speaker": "客服小美",
+      "text": "收到第一单100元！还差两单，继续加油！请再转200元第二单的本金。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "继续转200元",
+          "next_node": "pay_second",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "我不做了，把100元退给我",
+          "next_node": "demand_full_refund",
+          "risk_delta": -5,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "越投越多，越陷越深，这是典型的'沉没成本'陷阱。"
+    },
+    {
+      "id": "demand_full_refund",
+      "speaker": "客服小美",
+      "text": "不行哦，任务没完成不能退款。您要是不完成三单，之前的100元也拿不回来。还是继续做完吧，做完就一起返给您了。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "好吧，我继续做完",
+          "next_node": "pay_second",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "我被骗了！我要报警",
+          "next_node": "scammed_report",
+          "risk_delta": -5,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "发现被骗后第一时间报警，还可能挽回损失。"
+    },
+    {
+      "id": "pay_second",
+      "speaker": "客服小美",
+      "text": "收到第二单200元！就差最后一单了！再转300元就能全部结算了。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "再转300元",
+          "next_node": "pay_third",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "感觉不对，我不做了",
+          "next_node": "scammed_report",
+          "risk_delta": -5,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "骗子用'就差一点'的话术让你舍不得放弃，但其实是无底洞。"
+    },
+    {
+      "id": "pay_third",
+      "speaker": "客服小美",
+      "text": "三单完成！但是很抱歉，系统检测到您操作超时，订单被冻结了。需要再交500元解冻金，解冻后一起返还您1680元。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "交解冻金500元",
+          "next_node": "pay_more",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_2",
+          "text": "这就是诈骗！我要报警",
+          "next_node": "scammed_report",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "'资金冻结''交解冻金'是刷单诈骗的典型第二步，目的是让你越陷越深。"
+    },
+    {
+      "id": "pay_more",
+      "speaker": "系统",
+      "text": "您又交了500元解冻金。随后对方又以'信用分不足''VIP通道'等理由不断要求您打钱。等您意识到被骗时，已经损失了3000元。对方已经失联，钱也追不回来了。\n\n惨痛教训：\n1. 刷单本身违法，所有刷单都是诈骗\n2. 先小利后大亏是诈骗的固定套路\n3. 凡是要求先垫付的都是诈骗\n4. 发现被骗立即报警，不要心存幻想",
+      "is_end": true,
+      "node_type": "ending_bad",
+      "options": []
+    },
+    {
+      "id": "scammed_report",
+      "speaker": "系统",
+      "text": "您意识到被骗后立即拨打110报警，并保留了聊天记录和转账凭证。虽然损失了部分资金，但您及时止损，没有越陷越深。\n\n防骗要点：\n• 刷单就是诈骗，不要有侥幸心理\n• 不贪小便宜，不相信轻松高薪\n• 遇到疑问先和家人朋友商量\n• 被骗后第一时间报警",
+      "is_end": true,
+      "node_type": "ending_neutral",
+      "options": []
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "id": "fake_police",
+  "name": "冒充公检法诈骗",
+  "description": "骗子冒充公安、检察院、法院工作人员，以涉嫌洗钱、贩毒等罪名为由，要求受害人将资金转入'安全账户'进行核查。",
+  "difficulty": "hard",
+  "estimated_time": 5,
+  "scam_type": "冒充公检法",
+  "nodes": [
+    {
+      "id": "start",
+      "speaker": "未知来电",
+      "text": "您好，这里是XX市公安局，您的身份证信息涉嫌一起重大洗钱案件，请配合我们调查。",
+      "is_start": true,
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "什么？怎么可能？我要核实一下",
+          "next_node": "verify_request",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "好的，我配合调查",
+          "next_node": "cooperate",
+          "risk_delta": 10,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_3",
+          "text": "直接挂断电话",
+          "next_node": "hang_up",
+          "risk_delta": -5,
+          "is_safe_choice": true
+        }
+      ],
+      "risk_tip": "公检法机关不会通过电话办案，更不会要求转账。"
+    },
+    {
+      "id": "verify_request",
+      "speaker": "骗子（假冒警察）",
+      "text": "您可以通过114查询我们的号码，我们的警号是001234。为了您的资金安全，案件调查期间请保密，不要告诉任何人。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "我还是不信，我打110报警确认",
+          "next_node": "call_police",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "那好吧，你们说怎么办",
+          "next_node": "cooperate",
+          "risk_delta": 15,
+          "is_safe_choice": false
+        }
+      ],
+      "risk_tip": "骗子可以用技术手段伪造来电显示，114查询不能作为核实依据。"
+    },
+    {
+      "id": "cooperate",
+      "speaker": "骗子（假冒检察官）",
+      "text": "我是XX检察院的李检察官。根据调查，您的银行账户涉嫌洗钱200万。现在需要您将所有资金转入'国家安全账户'进行核查，核查无问题后会原路退回。",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "国家安全账户？听起来不对，我要咨询律师",
+          "next_node": "consult_lawyer",
+          "risk_delta": 0,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "我没有那么多钱，只有几万块存款",
+          "next_node": "small_amount",
+          "risk_delta": 20,
+          "is_safe_choice": false
+        },
+        {
+          "id": "opt_3",
+          "text": "好的，我怎么转给你们？",
+          "next_node": "transfer_info",
+          "risk_delta": 30,
+          "is_safe_choice": false
+        }
+      ],
+      "risk_tip": "根本不存在'国家安全账户'！公检法机关不会要求转账汇款。"
+    },
+    {
+      "id": "hang_up",
+      "speaker": "系统",
+      "text": "您果断挂断了电话。正确的做法是：遇到可疑电话，直接挂断，拨打110或到附近派出所核实。",
+      "is_end": true,
+      "node_type": "ending_good",
+      "options": []
+    },
+    {
+      "id": "call_police",
+      "speaker": "系统",
+      "text": "您拨打110报警，经确认这是一起诈骗电话。您成功避免了财产损失！正确做法：遇到可疑情况，第一时间拨打110核实。",
+      "is_end": true,
+      "node_type": "ending_good",
+      "options": []
+    },
+    {
+      "id": "consult_lawyer",
+      "speaker": "系统",
+      "text": "您咨询了律师朋友，得知这是典型的冒充公检法诈骗。您及时报警，避免了损失。正确做法：遇到重大事项，咨询信任的人或专业人士。",
+      "is_end": true,
+      "node_type": "ending_good",
+      "options": []
+    },
+    {
+      "id": "small_amount",
+      "speaker": "骗子（假冒检察官）",
+      "text": "不管多少钱都要核查！先把您手头的钱全部转过来，否则我们就要下通缉令了。您现在马上操作！",
+      "trigger_calm": true,
+      "calm_message": "请深呼吸，保持冷静！\n\n真正的公检法机关不会：\n• 电话办案\n• 要求转账汇款\n• 威胁下发通缉令\n\n请花10秒钟冷静思考！",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "我不转了，这是诈骗！",
+          "next_node": "realize_scam",
+          "risk_delta": -10,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "好吧，我转...",
+          "next_node": "transfer_money",
+          "risk_delta": 25,
+          "is_safe_choice": false,
+          "trigger_calm": false
+        }
+      ],
+      "risk_tip": "骗子善于制造紧迫感，让你来不及思考就行动。"
+    },
+    {
+      "id": "transfer_info",
+      "speaker": "骗子（假冒检察官）",
+      "text": "好的。请准备好银行卡号和密码，我会通过视频指导您操作。这是绝密案件，不允许告诉任何人，包括您的家人！",
+      "trigger_calm": true,
+      "calm_message": "⚠️ 危险警告！\n\n任何要求您：\n• 提供银行卡密码\n• 进行屏幕共享\n• 转账到'安全账户'\n\n的都是诈骗！\n\n请深呼吸，冷静10秒钟！",
+      "options": [
+        {
+          "id": "opt_1",
+          "text": "密码不能告诉别人，我要报警",
+          "next_node": "call_police",
+          "risk_delta": -5,
+          "is_safe_choice": true
+        },
+        {
+          "id": "opt_2",
+          "text": "好吧，我配合",
+          "next_node": "transfer_money",
+          "risk_delta": 20,
+          "is_safe_choice": false
+        }
+      ],
+      "risk_tip": "银行卡密码是您资金安全的最后一道防线，绝对不能告诉任何人！"
+    },
+    {
+      "id": "realize_scam",
+      "speaker": "系统",
+      "text": "您及时识破了骗局，并拨打110报警。虽然过程中有些犹豫，但您最终做出了正确的选择！",
+      "is_end": true,
+      "node_type": "ending_neutral",
+      "options": []
+    },
+    {
+      "id": "transfer_money",
+      "speaker": "系统",
+      "text": "您按照骗子的指示转账了5万元。钱转出后，对方立即失联，您发现上当受骗，损失了全部积蓄。\n\n教训：\n1. 公检法机关不会通过电话办案\n2. 不存在'安全账户'\n3. 不透露银行卡密码和验证码\n4. 遇到可疑情况，先和家人商量或打110",
+      "is_end": true,
+      "node_type": "ending_bad",
+      "options": []
+    }
+  ]
+}
