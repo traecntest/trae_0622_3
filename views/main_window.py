@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
                 color: white;
                 border: none;
                 border-radius: 4px;
-                padding: 6px 8px;
+                padding: 6px 12px;
                 font-size: 11px;
             }
             QPushButton:hover {
@@ -113,7 +113,7 @@ class MainWindow(QMainWindow):
                 color: white;
                 border: none;
                 border-radius: 4px;
-                padding: 6px 8px;
+                padding: 6px 12px;
                 font-size: 11px;
             }
             QPushButton:hover {
@@ -345,7 +345,6 @@ class MainWindow(QMainWindow):
         user_title.addStretch()
         create_user_btn = QPushButton("+ 创建新用户")
         create_user_btn.setObjectName("primaryButton")
-        create_user_btn.setFixedHeight(36)
         create_user_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         create_user_btn.clicked.connect(self._show_create_user_dialog)
         user_title.addWidget(create_user_btn)
@@ -380,7 +379,6 @@ class MainWindow(QMainWindow):
 
         self.elderly_toggle = QPushButton("开启")
         self.elderly_toggle.setCheckable(True)
-        self.elderly_toggle.setFixedSize(80, 36)
         self.elderly_toggle.setCursor(Qt.CursorShape.PointingHandCursor)
         self.elderly_toggle.setStyleSheet("""
             QPushButton {
@@ -389,6 +387,8 @@ class MainWindow(QMainWindow):
                 border-radius: 18px;
                 color: #666;
                 font-weight: bold;
+                padding: 8px 20px;
+                min-width: 60px;
             }
             QPushButton:checked {
                 background-color: #22c55e;
@@ -769,12 +769,11 @@ class MainWindow(QMainWindow):
 
             if is_current:
                 current_tag = QLabel("✓ 当前使用")
-                current_tag.setStyleSheet("color: #3498db; font-size: 12px; font-weight: bold; padding: 4px 10px; background-color: #d6eaf8; border-radius: 10px;")
+                current_tag.setStyleSheet("color: #3498db; font-size: 12px; font-weight: bold; padding: 6px 14px; background-color: #d6eaf8; border-radius: 10px;")
                 btn_layout.addWidget(current_tag)
             else:
                 switch_btn = QPushButton("切换")
                 switch_btn.setObjectName("secondaryButton")
-                switch_btn.setFixedSize(60, 32)
                 switch_btn.setCursor(Qt.CursorShape.PointingHandCursor)
                 switch_btn.setStyleSheet("""
                     QPushButton {
@@ -782,8 +781,9 @@ class MainWindow(QMainWindow):
                         color: white;
                         border: none;
                         border-radius: 6px;
-                        font-size: 12px;
+                        font-size: 13px;
                         font-weight: bold;
+                        padding: 8px 18px;
                     }
                     QPushButton:hover {
                         background-color: #2980b9;
@@ -859,7 +859,6 @@ class MainWindow(QMainWindow):
         elderly_row.addStretch()
         elderly_check = QPushButton("关闭")
         elderly_check.setCheckable(True)
-        elderly_check.setFixedSize(72, 32)
         elderly_check.setCursor(Qt.CursorShape.PointingHandCursor)
         elderly_check.setStyleSheet("""
             QPushButton {
@@ -868,6 +867,8 @@ class MainWindow(QMainWindow):
                 border-radius: 16px;
                 color: #666;
                 font-weight: bold;
+                padding: 8px 20px;
+                min-width: 56px;
             }
             QPushButton:checked {
                 background-color: #22c55e;
