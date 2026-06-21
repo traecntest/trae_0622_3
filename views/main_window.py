@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QPushButton, QStackedWidget, QFrame, QButtonGroup,
-                             QMessageBox, QFileDialog)
+                             QMessageBox, QFileDialog, QLineEdit, QSpinBox, QDialog,
+                             QDialogButtonBox, QScrollArea)
 from PyQt6.QtCore import Qt, QSize, QTimer
 from PyQt6.QtGui import QFont, QIcon
 
@@ -35,6 +36,8 @@ class MainWindow(QMainWindow):
         self._apply_style()
 
         self.elderly_manager.mode_changed.connect(self._on_elderly_mode_changed)
+        self._init_default_user()
+        self._update_user_display()
 
     def _setup_ui(self):
         central_widget = QWidget()
@@ -53,13 +56,75 @@ class MainWindow(QMainWindow):
 
         app_title = QLabel("银盾反诈")
         app_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        app_title.setStyleSheet("font-size: 22px; font-weight: bold; color: white; padding: 25px 0 15px 0;")
+        app_title.setStyleSheet("font-size: 22px; font-weight: bold; color: white; padding: 25px 0 8px 0;")
         sidebar_layout.addWidget(app_title)
 
         app_subtitle = QLabel("彩排室")
         app_subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        app_subtitle.setStyleSheet("font-size: 14px; color: #94a3b8; padding-bottom: 20px;")
+        app_subtitle.setStyleSheet("font-size: 14px; color: #94a3b8; padding-bottom: 15px;")
         sidebar_layout.addWidget(app_subtitle)
+
+        user_frame = QFrame()
+        user_frame.setStyleSheet("""
+            QFrame {
+                background-color: rgba(255,255,255,0.08);
+                border-radius: 8px;
+                margin: 0 12px 12px 12px;
+            }
+        """)
+        user_layout = QVBoxLayout(user_frame)
+        user_layout.setContentsMargins(10, 10, 10, 10)
+        user_layout.setSpacing(4)
+
+        self.user_name_label = QLabel("当前用户")
+        self.user_name_label.setStyleSheet("color: white; font-size: 13px; font-weight: bold;")
+        user_layout.addWidget(self.user_name_label)
+
+        self.user_info_label = QLabel("未登录")
+        self.user_info_label.setStyleSheet("color: #94a3b8; font-size: 11px;")
+        user_layout.addWidget(self.user_info_label)
+
+        user_btn_layout = QHBoxLayout()
+        user_btn_layout.setSpacing(6)
+
+        self.switch_user_btn = QPushButton("切换用户")
+        self.switch_user_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.switch_user_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(52,152,219,0.3);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            QPushButton:hover {
+                background-color: rgba(52,152,219,0.5);
+            }
+        """)
+        self.switch_user_btn.clicked.connect(self._show_user_manager)
+        user_btn_layout.addWidget(self.switch_user_btn)
+
+        self.add_user_btn = QPushButton("+新用户")
+        self.add_user_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.add_user_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(34,197,94,0.3);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            QPushButton:hover {
+                background-color: rgba(34,197,94,0.5);
+            }
+        """)
+        self.add_user_btn.clicked.connect(self._show_create_user_dialog)
+        user_btn_layout.addWidget(self.add_user_btn)
+
+        user_layout.addLayout(user_btn_layout)
+        sidebar_layout.addWidget(user_frame)
 
         self.nav_buttons = []
         self.button_group = QButtonGroup(self)
@@ -260,11 +325,46 @@ class MainWindow(QMainWindow):
         self.settings_page = QWidget()
         layout = QVBoxLayout(self.settings_page)
         layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(16)
 
         title_label = QLabel("设置")
         title_label.setObjectName("titleLabel")
         title_label.setStyleSheet("font-size: 22px; font-weight: bold; color: #2c3e50;")
         layout.addWidget(title_label)
+
+        user_card = QFrame()
+        user_card.setStyleSheet("background-color: white; border-radius: 10px;")
+        user_card_layout = QVBoxLayout(user_card)
+        user_card_layout.setContentsMargins(20, 18, 20, 18)
+        user_card_layout.setSpacing(14)
+
+        user_title = QHBoxLayout()
+        user_title_label = QLabel("用户管理")
+        user_title_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #2c3e50;")
+        user_title.addWidget(user_title_label)
+        user_title.addStretch()
+        create_user_btn = QPushButton("+ 创建新用户")
+        create_user_btn.setObjectName("primaryButton")
+        create_user_btn.setFixedHeight(36)
+        create_user_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        create_user_btn.clicked.connect(self._show_create_user_dialog)
+        user_title.addWidget(create_user_btn)
+        user_card_layout.addLayout(user_title)
+
+        self.users_scroll = QScrollArea()
+        self.users_scroll.setWidgetResizable(True)
+        self.users_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.users_scroll.setMaximumHeight(300)
+
+        self.users_container = QWidget()
+        self.users_list_layout = QVBoxLayout(self.users_container)
+        self.users_list_layout.setContentsMargins(0, 0, 0, 0)
+        self.users_list_layout.setSpacing(8)
+
+        self.users_scroll.setWidget(self.users_container)
+        user_card_layout.addWidget(self.users_scroll)
+
+        layout.addWidget(user_card)
 
         settings_card = QFrame()
         settings_card.setStyleSheet("background-color: white; border-radius: 10px;")
@@ -337,6 +437,8 @@ class MainWindow(QMainWindow):
             self.content_stack.setCurrentWidget(page)
             if page_name == "records":
                 self._refresh_records()
+            elif page_name == "settings":
+                self._refresh_users_list()
 
     def _on_script_selected(self, script_id):
         self.current_script_id = script_id
@@ -522,20 +624,33 @@ class MainWindow(QMainWindow):
             name_label.setStyleSheet("font-size: 15px; font-weight: bold; color: #333;")
             info_layout.addWidget(name_label)
 
-            date_label = QLabel(str(record.created_at))
+            user = self.main_controller.get_user(record.user_id)
+            user_name = user.nickname if user and user.nickname else (user.username if user else "未知")
+            date_label = QLabel(f"{user_name} · {record.created_at}")
             date_label.setStyleSheet("font-size: 12px; color: #999;")
             info_layout.addWidget(date_label)
 
             card_layout.addLayout(info_layout)
             card_layout.addStretch()
 
+            level_color = self._get_risk_color(record.final_risk_score)
             score_label = QLabel(f"{record.final_risk_score}分")
-            score_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #f59e0b;")
+            score_label.setStyleSheet(f"font-size: 18px; font-weight: bold; color: {level_color};")
             card_layout.addWidget(score_label)
 
             self.records_layout.addWidget(record_card)
 
         self.records_layout.addStretch()
+
+    def _get_risk_color(self, score):
+        if score <= 20:
+            return "#22c55e"
+        elif score <= 50:
+            return "#eab308"
+        elif score <= 80:
+            return "#f97316"
+        else:
+            return "#ef4444"
 
     def _toggle_elderly_mode(self):
         is_elderly = self.elderly_manager.toggle()
@@ -576,6 +691,226 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "生成失败", "PDF生成失败，请检查系统字体配置。")
         except Exception as e:
             QMessageBox.critical(self, "错误", f"生成失败：{str(e)}")
+
+    def _init_default_user(self):
+        user = self.main_controller.get_or_create_default_user()
+        if user.is_elderly_mode:
+            self.elderly_manager.set_elderly_mode(True)
+            self.elderly_btn.setChecked(True)
+            self.elderly_toggle.setChecked(True)
+            self.elderly_toggle.setText("关闭")
+
+    def _update_user_display(self):
+        user = self.main_controller.get_current_user()
+        if user:
+            display_name = user.nickname if user.nickname else user.username
+            self.user_name_label.setText(display_name)
+            if user.age:
+                self.user_info_label.setText(f"{user.age}岁 · 账号：{user.username}")
+            else:
+                self.user_info_label.setText(f"账号：{user.username}")
+        else:
+            self.user_name_label.setText("当前用户")
+            self.user_info_label.setText("未登录")
+
+    def _refresh_users_list(self):
+        for i in reversed(range(self.users_list_layout.count())):
+            item = self.users_list_layout.takeAt(i)
+            if item.widget():
+                item.widget().deleteLater()
+
+        users = self.main_controller.list_users()
+        current_user = self.main_controller.get_current_user()
+
+        if not users:
+            empty_label = QLabel("暂无用户，请创建新用户")
+            empty_label.setStyleSheet("color: #999; font-size: 13px; padding: 20px;")
+            empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.users_list_layout.addWidget(empty_label)
+            self.users_list_layout.addStretch()
+            return
+
+        for user in users:
+            user_row = QFrame()
+            is_current = current_user and current_user.id == user.id
+            border_color = "#3498db" if is_current else "#e5e7eb"
+            bg_color = "#ebf5fb" if is_current else "white"
+            user_row.setStyleSheet(f"""
+                QFrame {{
+                    background-color: {bg_color};
+                    border: 2px solid {border_color};
+                    border-radius: 8px;
+                }}
+            """)
+            row_layout = QHBoxLayout(user_row)
+            row_layout.setContentsMargins(14, 10, 14, 10)
+
+            info_layout = QVBoxLayout()
+            name = user.nickname if user.nickname else user.username
+            name_label = QLabel(name)
+            name_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #333;")
+            info_layout.addWidget(name_label)
+
+            extras = []
+            extras.append(user.username)
+            if user.age:
+                extras.append(f"{user.age}岁")
+            if user.is_elderly_mode:
+                extras.append("老人模式")
+            extra_label = QLabel(" · ".join(extras))
+            extra_label.setStyleSheet("font-size: 12px; color: #7f8c8d;")
+            info_layout.addWidget(extra_label)
+
+            row_layout.addLayout(info_layout)
+            row_layout.addStretch()
+
+            btn_layout = QHBoxLayout()
+            btn_layout.setSpacing(6)
+
+            if is_current:
+                current_tag = QLabel("✓ 当前使用")
+                current_tag.setStyleSheet("color: #3498db; font-size: 12px; font-weight: bold; padding: 4px 10px; background-color: #d6eaf8; border-radius: 10px;")
+                btn_layout.addWidget(current_tag)
+            else:
+                switch_btn = QPushButton("切换")
+                switch_btn.setObjectName("secondaryButton")
+                switch_btn.setFixedSize(60, 32)
+                switch_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+                switch_btn.setStyleSheet("""
+                    QPushButton {
+                        background-color: #3498db;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        font-weight: bold;
+                    }
+                    QPushButton:hover {
+                        background-color: #2980b9;
+                    }
+                """)
+                switch_btn.clicked.connect(lambda checked, u=user: self._switch_user(u))
+                btn_layout.addWidget(switch_btn)
+
+            row_layout.addLayout(btn_layout)
+            self.users_list_layout.addWidget(user_row)
+
+        self.users_list_layout.addStretch()
+
+    def _switch_user(self, user):
+        self.main_controller.set_current_user(user)
+        if user.is_elderly_mode != self.elderly_manager.is_elderly_mode():
+            self.elderly_manager.set_elderly_mode(user.is_elderly_mode)
+            self.elderly_btn.setChecked(user.is_elderly_mode)
+            self.elderly_toggle.setChecked(user.is_elderly_mode)
+            self.elderly_toggle.setText("关闭" if user.is_elderly_mode else "开启")
+        self._update_user_display()
+        self._refresh_users_list()
+        QMessageBox.information(self, "切换成功", f"已切换到用户：{user.nickname if user.nickname else user.username}")
+
+    def _show_user_manager(self):
+        self._navigate_to("settings")
+        self.nav_buttons[2][0].setChecked(True)
+
+    def _show_create_user_dialog(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("创建新用户")
+        dialog.setFixedWidth(380)
+
+        dlg_layout = QVBoxLayout(dialog)
+        dlg_layout.setContentsMargins(24, 20, 24, 20)
+        dlg_layout.setSpacing(16)
+
+        username_row = QVBoxLayout()
+        username_label = QLabel("用户名（必填，唯一标识）")
+        username_label.setStyleSheet("font-size: 13px; color: #333; font-weight: bold;")
+        username_row.addWidget(username_label)
+        username_input = QLineEdit()
+        username_input.setPlaceholderText("例如：zhang_san")
+        username_input.setFixedHeight(38)
+        username_row.addWidget(username_input)
+        dlg_layout.addLayout(username_row)
+
+        nickname_row = QVBoxLayout()
+        nickname_label = QLabel("昵称（显示用）")
+        nickname_label.setStyleSheet("font-size: 13px; color: #333; font-weight: bold;")
+        nickname_row.addWidget(nickname_label)
+        nickname_input = QLineEdit()
+        nickname_input.setPlaceholderText("例如：张三")
+        nickname_input.setFixedHeight(38)
+        nickname_row.addWidget(nickname_input)
+        dlg_layout.addLayout(nickname_row)
+
+        age_row = QVBoxLayout()
+        age_label = QLabel("年龄")
+        age_label.setStyleSheet("font-size: 13px; color: #333; font-weight: bold;")
+        age_row.addWidget(age_label)
+        age_input = QSpinBox()
+        age_input.setRange(0, 120)
+        age_input.setValue(30)
+        age_input.setFixedHeight(38)
+        age_row.addWidget(age_input)
+        dlg_layout.addLayout(age_row)
+
+        elderly_row = QHBoxLayout()
+        elderly_label = QLabel("老人模式")
+        elderly_label.setStyleSheet("font-size: 13px; color: #333; font-weight: bold;")
+        elderly_row.addWidget(elderly_label)
+        elderly_row.addStretch()
+        elderly_check = QPushButton("关闭")
+        elderly_check.setCheckable(True)
+        elderly_check.setFixedSize(72, 32)
+        elderly_check.setCursor(Qt.CursorShape.PointingHandCursor)
+        elderly_check.setStyleSheet("""
+            QPushButton {
+                background-color: #e5e7eb;
+                border: none;
+                border-radius: 16px;
+                color: #666;
+                font-weight: bold;
+            }
+            QPushButton:checked {
+                background-color: #22c55e;
+                color: white;
+            }
+        """)
+        elderly_check.clicked.connect(lambda: elderly_check.setText("开启" if not elderly_check.isChecked() else "关闭"))
+        elderly_row.addWidget(elderly_check)
+        dlg_layout.addLayout(elderly_row)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.button(QDialogButtonBox.StandardButton.Ok).setText("创建")
+        buttons.button(QDialogButtonBox.StandardButton.Cancel).setText("取消")
+        buttons.button(QDialogButtonBox.StandardButton.Ok).setFixedHeight(40)
+        buttons.button(QDialogButtonBox.StandardButton.Cancel).setFixedHeight(40)
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        dlg_layout.addWidget(buttons)
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            username = username_input.text().strip()
+            nickname = nickname_input.text().strip()
+            age = age_input.value()
+            is_elderly = elderly_check.isChecked()
+
+            if not username:
+                QMessageBox.warning(self, "创建失败", "用户名不能为空！")
+                return
+
+            existing = self.main_controller.create_user(username, nickname, age, is_elderly)
+            self.main_controller.set_current_user(existing)
+            self._update_user_display()
+            self._refresh_users_list()
+
+            if is_elderly != self.elderly_manager.is_elderly_mode():
+                self.elderly_manager.set_elderly_mode(is_elderly)
+                self.elderly_btn.setChecked(is_elderly)
+                self.elderly_toggle.setChecked(is_elderly)
+                self.elderly_toggle.setText("关闭" if is_elderly else "开启")
+
+            QMessageBox.information(self, "创建成功", f"用户 '{username}' 创建成功，已自动切换到该用户。")
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

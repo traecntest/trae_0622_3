@@ -69,8 +69,33 @@ class MainController:
         if user_id is None and self.current_user:
             user_id = self.current_user.id
         if user_id is None:
-            return []
+            return self._get_all_records(limit)
         return ExerciseRecord.list_by_user(user_id, limit)
+
+    def _get_all_records(self, limit=20):
+        from models.database import Database
+        db = Database()
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM exercise_records ORDER BY created_at DESC LIMIT ?",
+            (limit,)
+        )
+        rows = cursor.fetchall()
+        from models import ExerciseRecord
+        records = []
+        for row in rows:
+            records.append(ExerciseRecord._from_row(row))
+        return records
+
+    def get_or_create_default_user(self):
+        default_user = User.get_by_username("default_user")
+        if default_user:
+            self.set_current_user(default_user)
+            return default_user
+        user = self.create_user("default_user", "演练用户", None, False)
+        self.set_current_user(user)
+        return user
 
     def get_record_detail(self, record_id):
         return ExerciseRecord.get_by_id(record_id)
